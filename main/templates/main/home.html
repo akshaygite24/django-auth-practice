@@ -12,7 +12,14 @@
                     <h5 class="card-title">{{ post.title }}</h5>
                     <p>{{ post.description }}</p>
                 </div>
-                <div>Button</div>
+                <div>
+                    {% if request.user == post.author %}
+                        <form action="{% url 'delete_post' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" name="post_id" value="{{ post.id }}">Delete</button>
+                    </form>
+                    {% endif %}
+                </div>
             </div>
             <div class="card-footer text-muted">{{ post.created_at  }}</div>
         </div>

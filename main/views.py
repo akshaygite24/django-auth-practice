@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegisterForm, PostForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
@@ -39,3 +39,17 @@ def create_post(request):
         form = PostForm()
     
     return render(request, 'main/create_post.html', {'form': form})
+
+
+def delete_post(request):
+    if request.method == "POST":
+        post_id = request.POST.get('post_id')
+
+        post = get_object_or_404(Post, id=post_id) # if obj doesnt exist return 404 page
+
+        # print(post_id)
+        
+        if request.user == post.author:
+            post.delete()
+
+        return redirect('/home')
