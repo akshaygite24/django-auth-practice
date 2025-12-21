@@ -2,13 +2,38 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegisterForm, PostForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.models import User, Group
 from .models import Post
+
 
 # Create your views here.
 
 @login_required(login_url='login')
 def home(request):
     posts = Post.objects.all()
+
+    if request.method == "POST":
+        user_id = request.POST.get('user_id')
+
+        if user_id:
+            user = User.objects.filter(id=user_id).first()
+
+        
+            if user and request.user.is_staff:
+                try:
+                    group = Group.objects.filter(name='default').first()
+                    group.user_set.remove(user)
+                except:
+                    pass
+                
+                try:
+                    group = Group.objects.filter(name='mod').first()
+                    group.user_set.remove(user)     
+                except:
+                    pass
+
+        return redirect('/home')
+
     return render(request, 'main/home.html', {'posts': posts})
 
 
